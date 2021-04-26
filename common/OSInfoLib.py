@@ -21,6 +21,9 @@ class OSInfoLib(object):
     def _get_linux_osinfo():
         """返回 Linux 主机系统信息
             {
+                "platform": {
+                    "os": "Linux",
+                }
                 "release": {
                     "distribute": "CentOS Linux",
                     "version": "7.6.1810",
@@ -28,7 +31,7 @@ class OSInfoLib(object):
                 },
             }
         """
-        res = {"release": {}}
+        res = {"release": {}, "platform": {"os": "Linux"}}
         res["release"]["distribute"], res["release"]["version"] = platform.linux_distribution()[0:2]
         res["release"]["major"] = res["release"]["version"].split(".", 1)[0]
 
