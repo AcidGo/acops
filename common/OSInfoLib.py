@@ -39,7 +39,7 @@ class OSInfoLib(object):
 
     @staticmethod
     def _get_windows_osinfo():
-        riase Exception("unsupport windows now")
+        raise Exception("unsupport windows now")
 
     @staticmethod
     def _get_aix_osinfo():

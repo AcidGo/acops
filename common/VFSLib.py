@@ -44,11 +44,12 @@ class VFSLib(object):
                 }
             }
         """
-        mounted_file = "/proc/mount"
+        mounted_file = "/proc/mounts"
         ignore_fs = {
             "rootfs", "sysfs", "proc", "devtmpfs", "securityfs", 
             "tmpfs", "devpts", "cgroup", "pstore", "configfs", 
             "autofs", "debugfs", "hugetlbfs", "mqueue",
+            "rpc_pipefs", 
         }
 
         res = {}
@@ -59,7 +60,7 @@ class VFSLib(object):
                     continue
                 if is_all is False and lst[2] in ignore_fs:
                     continue
-                rse[lst[0]] = {
+                res[lst[0]] = {
                     "fs_file": lst[1],
                     "fs_type": lst[2],
                     "fs_options": lst[3],
