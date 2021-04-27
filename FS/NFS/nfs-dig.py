@@ -2,6 +2,7 @@
 # Author: AcidGo
 
 import logging
+# {% lib-stretch-import %}
 
 from common.OSInfoLib import *
 from common.RPCInfoLib import *
@@ -12,9 +13,7 @@ from common.VFSLib import *
 LOGGING_LEVEL = "info"
 # EOF CONFIG
 
-# {% lib-stretch %}
-
-# {% EOF lib-stretch %}
+# {% lib-stretch-code %}
 
 class NFSDig(object):
     def __init__(self):
@@ -31,7 +30,8 @@ class NFSDig(object):
 
     def add_nfs_target(self, nfs_hosts):
         for i in nfs_hosts.split(","):
-            self.nfs_hosts.append(i.strip())
+            if i:
+                self.nfs_hosts.append(i.strip())
 
     def find_nfs_target(self):
         fstab_file = "/etc/fstab"
@@ -49,6 +49,7 @@ class NFSDig(object):
         nfs_not_mounted = {}
         mounted_fs = VFSLib.get_mounted()
         logging.debug("mounted_fs: {!s}".format(str(mounted_fs)))
+
         for fs_spec, fs_args in self.fstab.items():
             if fs_spec not in mounted_fs:
                 nfs_not_mounted[fs_spec] = fs_args
@@ -56,13 +57,20 @@ class NFSDig(object):
             if not mounted_fs[fs_spec].get("fs_type", "").startswith("nfs"):
                 nfs_not_mounted[fs_spec] = fs_args
                 continue
+
         if len(nfs_not_mounted) > 0:
             logging.error("found not mounted nfs!")
             self.ok = False
             for fs_spec, fs_args in nfs_not_mounted.items():
                 lst = [fs_spec] + [v for v in fs_args.values()]
                 logging.error("not mounted: " + "\t".join(lst))
-        else:
+
+        for fs_spec, fs_args in mounted_fs.items():
+            if fs_args.get("fs_type", "").startswith("nfs") and fs_spec not in nfs_not_mounted:
+                lst = [fs_spec] + [v for v in fs_args.values()]
+                logging.info("the nfs target has been mounted: " + "\t".join(lst))
+
+        if len(nfs_not_mounted) == 0:
             logging.info("all nfs target in fstab has been mounted")
 
         # 2. check nfs network is accessed
@@ -73,6 +81,9 @@ class NFSDig(object):
                 self.ok = False
                 logging.error("cannot access remote {!s} rpc port {!s}".format(h, 111))
                 continue
+
+            logging.info("can accessed remote {!s} rpc port {!s}".format(h, 111))
+
             # 2.2 check nfs portmap service is accessed, only tcp
             nfs_svc_set = {
                 RPCInfoLib.RPC_SVC_MOUNTD: "mountd",
@@ -95,6 +106,8 @@ class NFSDig(object):
                 if not TCPLib.tcp_test(h, rpc_res["port"]):
                     self.ok = False
                     logging.error("cannot access remote {!s} rpc service {!s} with TCP".format(h, nfs_svc_set[rpc_res["program"]]))
+                else:
+                    logging.info("can access remote {!s} rpc service {!s} with TCP".format(h, nfs_svc_set[rpc_res["program"]]))
 
         logging.info("all done")
 
@@ -133,7 +146,7 @@ def init_logger(level, logfile=None):
 
 if __name__ == '__main__':
     # ########## Self Test
-    # INPUT_REMOTE_HOSTS = ""
+    INPUT_REMOTE_HOSTS = ""
     # ########## EOF Self Test
 
     init_logger(LOGGING_LEVEL)
