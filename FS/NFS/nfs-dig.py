@@ -133,7 +133,7 @@ def init_logger(level, logfile=None):
 
 if __name__ == '__main__':
     # ########## Self Test
-    # INPUT_REMOTE_HOSTS = "127.0.0.1"
+    # INPUT_REMOTE_HOSTS = ""
     # ########## EOF Self Test
 
     init_logger(LOGGING_LEVEL)
@@ -146,4 +146,4 @@ if __name__ == '__main__':
     nfs_dig.postcheck()
 
     if nfs_dig.ok is False:
-        raise Exception("has error")
+        raise Exception("result has error, please check it")
