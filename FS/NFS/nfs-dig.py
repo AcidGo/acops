@@ -4,10 +4,10 @@
 import logging
 # {% lib-stretch-import %}
 
-from common.OSInfoLib import *
-from common.RPCInfoLib import *
-from common.TCPLib import *
-from common.VFSLib import *
+from common.OS.OSInfoLib import *
+from common.Linux.RPCInfoLib import *
+from common.Network.TCPLib import *
+from common.Filesystem.VFSLib import *
 
 # CONFIG
 LOGGING_LEVEL = "info"

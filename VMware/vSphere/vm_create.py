@@ -12,6 +12,18 @@ import re
 import time
 from pyVmomi import vim, vmodl
 from pyVim.connect import SmartConnect, SmartConnectNoSSL, Disconnect
+# {% lib-stretch-import %}
+
+from common.VMware.ClusterLib import *
+from common.VMware.DatacenterLib import *
+from common.VMware.DatastoreLib import *
+from common.VMware.HostLib import *
+from common.VMware.NetworkLib import *
+from common.Network.Utils import *
+from common.VMware.VBaseLib import *
+from common.VMware.VCConfig import *
+from common.VMware.VirtualMachineLib import *
+
 
 # ########## CONFIG
 # 创建虚拟机最大内存限制，单位为 GB
@@ -66,6 +78,8 @@ NET_DVS_SKEW = True
 NET_DVS_TYPE = "_type_dvs"
 NET_VSS_TYPE = "_type_vss"
 # ########## EOF CONFIG
+
+# {% lib-stretch-code %}
 
 class VMCreate(VCConfig):
     def __init__(self):
