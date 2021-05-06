@@ -82,7 +82,7 @@ class NFSDig(object):
                 logging.error("cannot access remote {!s} rpc port {!s}".format(h, 111))
                 continue
 
-            logging.info("can accessed remote {!s} rpc port {!s}".format(h, 111))
+            logging.info("can access remote {!s} rpc port {!s}".format(h, 111))
 
             # 2.2 check nfs portmap service is accessed, only tcp
             nfs_svc_set = {
@@ -105,9 +105,9 @@ class NFSDig(object):
                 tested_ports.add(rpc_res["port"])
                 if not TCPLib.tcp_test(h, rpc_res["port"]):
                     self.ok = False
-                    logging.error("cannot access remote {!s} rpc service {!s} with TCP".format(h, nfs_svc_set[rpc_res["program"]]))
+                    logging.error("cannot access remote {!s} rpc service {!s} with {!s}/TCP".format(h, nfs_svc_set[rpc_res["program"]], rpc_res["port"]))
                 else:
-                    logging.info("can access remote {!s} rpc service {!s} with TCP".format(h, nfs_svc_set[rpc_res["program"]]))
+                    logging.info("can access remote {!s} rpc service {!s} with {!s}/TCP".format(h, nfs_svc_set[rpc_res["program"]], rpc_res["port"]))
 
         logging.info("all done")
 
