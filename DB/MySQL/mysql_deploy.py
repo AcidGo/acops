@@ -6,8 +6,10 @@ import grp
 import logging
 import pwd
 # {% lib-stretch-import %}
+from common.Linux.CommandLib import *
 from common.Linux.GroupLib import *
 from common.Linux.UserLib import *
+from common.MySQL.ConfLib import *
 from common.OS.OSInfoLib import *
 from common.URI.URILib import *
 
@@ -91,14 +93,20 @@ class MySQLDeploy(object):
         self._group_gid = grp.getgrnam(self.my_dep_group).gr_gid
 
     def execute(self):
-        # 1. using pkg uri
+        # 1. prepare user and group
+        if self._group_need_create:
+            GroupLib.create(self.my_dep_group)
+        if self._user_need_create:
+            UserLib.create(self.my_dep_user, primary_group=self.my_dep_group)
+
+        # 2. using pkg uri
         if self._basedir_need_create:
             os.mkdir(self.my_dep_basedir)
             os.chown(self.my_dep_basedir, self._user_uid, self._group_gid)
             logging.info("created basedir {!s}".format(self.my_dep_basedir))
         URILib.move_folder(self.my_pkg_uri, self.my_dep_basedir, decompress=True)
 
-        # 2. fit configure in the file
+        # 3. fit configure in the file
         if self.my_cnf_uri:
             URILib.move_file(self.my_cnf_uri, self.my_dep_cnfpath)
         else:
@@ -106,9 +114,14 @@ class MySQLDeploy(object):
                 f.write(self.my_cnf_txt)
 
         # 3. insecure init for mysql
+        mysqld_path = ""
+        CommandLib.shell([mysqld_path, "--default-files={!s}".format(self.my_dep_cnfpath), "--initialize-insecure"])
 
         # 4. startup the deploied mysql instance
         if self.db_startup:
-            
+            pidfile = ConfLib.get_pidfile(self.my_dep_cnfpath)
+            mysqld_safe_path = ""
+            CommandLib.shell([mysqld_safe_path, "--default-files={!s}".format(self.my_dep_cnfpath)], background=True)
+            time.sleep(10)
 
 
